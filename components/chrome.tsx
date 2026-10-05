@@ -6,11 +6,21 @@ import { useEffect, useState } from "react";
 import { site } from "@/lib/site";
 import { wrap } from "@/lib/ui";
 
+function syncFavicon(theme: string | undefined) {
+  const href = theme === "dark" ? "/acquisiflow-symbol-dark.png" : "/acquisiflow-symbol-light.png";
+  document.querySelectorAll('link[rel="icon"]').forEach((el) => el.remove());
+  const link = document.createElement("link");
+  link.rel = "icon";
+  link.type = "image/png";
+  link.href = href;
+  document.head.appendChild(link);
+}
 
 function toggleTheme() {
   const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
   document.documentElement.dataset.theme = next;
   try { localStorage.setItem("af-theme", next); } catch {}
+  syncFavicon(next);
 }
 
 export function Header() {
@@ -18,6 +28,7 @@ export function Header() {
   const [active, setActive] = useState("");
 
   useEffect(() => {
+    syncFavicon(document.documentElement.dataset.theme);
     const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setActive(e.target.id)), { rootMargin: "-45% 0px -50% 0px" });
     site.nav.forEach((n) => { const el = document.getElementById(n.href.slice(1)); if (el) io.observe(el); });
     const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
