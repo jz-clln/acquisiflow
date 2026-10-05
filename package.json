@@ -10,11 +10,13 @@
   "dependencies": {
     "@icons-pack/react-simple-icons": "^13.15.1",
     "@remotion/player": "^4.0.533",
+    "clsx": "^2.1.1",
     "lucide-react": "^1.52.0",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "remotion": "^4.0.533"
+    "remotion": "^4.0.533",
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "latest",
