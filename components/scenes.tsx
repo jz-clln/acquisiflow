@@ -109,7 +109,7 @@ export function ProcessScene({ vertical = false }: ProcessProps) {
   const nh = vertical ? 104 : 170;
   const gap = vertical ? 40 : (W - 40 - nw * 5) / 4;
   const x0 = 20;
-  const y0 = vertical ? 20 : 40;
+  const y0 = vertical ? 20 : 30;
   const at = (i: number) => (vertical ? { x: x0, y: y0 + i * (nh + gap) } : { x: x0 + i * (nw + gap), y: y0 });
   const start = (i: number) => 6 + i * 24;
 
@@ -139,7 +139,7 @@ export function ProcessScene({ vertical = false }: ProcessProps) {
             <g opacity={out} stroke="var(--brand)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" fill="none">
               <path d={`M ${c2} ${yb + 6} C ${c2} ${yb + 96} ${c1} ${yb + 96} ${c1} ${yb + 18}`} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - loop} />
               <path d={`M ${c1 - 8} ${yb + 28} L ${c1} ${yb + 16} L ${c1 + 8} ${yb + 28}`} opacity={loop >= 1 ? 1 : 0} />
-              <text x={(c1 + c2) / 2} y={yb + 128} textAnchor="middle" fontSize={20} fill="var(--secondary)" stroke="none" fontFamily={font} opacity={interpolate(f, [150, 166], [0, 1], C)}>
+              <text x={(c1 + c2) / 2} y={yb + 122} textAnchor="middle" fontSize={20} fill="var(--secondary)" stroke="none" fontFamily={font} opacity={interpolate(f, [150, 166], [0, 1], C)}>
                 Each iteration is reviewed with you
               </text>
             </g>
@@ -203,6 +203,7 @@ const tools: [string, ReactElement][] = [
 const tangles: [number, number][] = [[0, 2], [1, 3], [2, 4], [0, 3], [1, 4]];
 const CHIP_W = 236, CHIP_H = 54;
 const chipY = (i: number) => 30 + i * 72;
+const CARD_X = 450, CARD_W = 250, CARD_H = 264, CARD_Y = 222 - CARD_H / 2;
 
 export function ToolsScene() {
   const f = useCurrentFrame();
@@ -228,7 +229,7 @@ export function ToolsScene() {
           {tools.map((_, i) => {
             const p = interpolate(f, [86 + i * 4, 114 + i * 4], [0, 1], C);
             const yc = chipY(i) + CHIP_H / 2;
-            return <path key={i} d={`M ${110 + CHIP_W} ${yc} C 410 ${yc} 420 222 470 222`} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - p} />;
+            return <path key={i} d={`M ${110 + CHIP_W} ${yc} C 392 ${yc} 404 222 ${CARD_X} 222`} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - p} />;
           })}
         </g>
       </svg>
@@ -236,18 +237,18 @@ export function ToolsScene() {
       {tools.map(([t, icon], i) => {
         const a = spring({ frame: f - i * 6, fps, config: { damping: 200 } });
         return (
-          <div key={t} style={{ position: "absolute", left: chipX, top: chipY(i), width: CHIP_W, height: CHIP_H, boxSizing: "border-box", borderRadius: 999, border: "2px solid var(--border-strong)", background: "var(--surface)", display: "flex", alignItems: "center", gap: 12, padding: "0 20px", fontSize: 22, opacity: a * out, transform: `translateX(${(1 - a) * -24}px)` }}>
+          <div key={t} style={{ position: "absolute", left: chipX, top: chipY(i), width: CHIP_W, height: CHIP_H, boxSizing: "border-box", borderRadius: 999, border: "2px solid var(--border-strong)", background: "var(--surface)", display: "flex", alignItems: "center", gap: 12, padding: "0 20px", fontSize: 22, whiteSpace: "nowrap", overflow: "hidden", opacity: a * out, transform: `translateX(${(1 - a) * -24}px)` }}>
             <span style={{ display: "grid", placeItems: "center", flexShrink: 0 }}>{icon}</span>{t}
           </div>
         );
       })}
 
-      <div style={{ position: "absolute", left: 470, top: 100, width: 230, height: 244, boxSizing: "border-box", borderRadius: 28, background: "var(--brand)", color: "var(--on-brand)", padding: "26px 28px", opacity: card * out, transform: `scale(${0.9 + 0.1 * card})` }}>
-        <div style={{ fontFamily: display, fontWeight: 700, fontSize: 34, letterSpacing: "-0.03em", lineHeight: 1.05 }}>One system</div>
-        <div style={{ marginTop: 22, display: "grid", gap: 14, fontSize: 23 }}>
+      <div style={{ position: "absolute", left: CARD_X, top: CARD_Y, width: CARD_W, height: CARD_H, boxSizing: "border-box", borderRadius: 28, background: "var(--brand)", color: "var(--on-brand)", padding: "0 26px", display: "flex", flexDirection: "column", justifyContent: "center", overflow: "hidden", opacity: card * out, transform: `scale(${0.9 + 0.1 * card})` }}>
+        <div style={{ fontFamily: display, fontWeight: 700, fontSize: 30, letterSpacing: "-0.03em", lineHeight: 1.1, whiteSpace: "nowrap" }}>One system</div>
+        <div style={{ marginTop: 20, display: "grid", gap: 14, fontSize: 22 }}>
           {rows.map(([r, Icon], k) => (
-            <div key={r} style={{ display: "flex", alignItems: "center", gap: 12, opacity: interpolate(f, [118 + k * 8, 130 + k * 8], [0, 1], C) }}>
-              <Icon size={26} strokeWidth={1.9} />{r}
+            <div key={r} style={{ display: "flex", alignItems: "center", gap: 12, whiteSpace: "nowrap", opacity: interpolate(f, [118 + k * 8, 130 + k * 8], [0, 1], C) }}>
+              <Icon size={24} strokeWidth={1.9} style={{ flexShrink: 0 }} />{r}
             </div>
           ))}
         </div>

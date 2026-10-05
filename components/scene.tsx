@@ -2,6 +2,7 @@
 
 import { Player, type PlayerRef } from "@remotion/player";
 import { useEffect, useRef, useState, type ComponentType, type KeyboardEvent, type PointerEvent } from "react";
+import { isLowPerf, isReducedMotion } from "@/lib/perf";
 
 type Props<P> = {
   component: ComponentType<P>;
@@ -34,13 +35,21 @@ export function Scene<P extends Record<string, unknown>>({ component, inputProps
     const el = box.current, player = ref.current;
     if (!el || !player) return;
 
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    let io: IntersectionObserver | undefined;
+
+    // Settle on the finished frame and stop playback (reduced motion, low-end devices, or a runtime downgrade).
+    const rest = () => {
+      io?.disconnect();
       if (posAt) take(posAt(still));
-      else player.seekTo(still);
+      else { manual.current = true; player.pause(); player.seekTo(still); }
+    };
+
+    if (isReducedMotion() || isLowPerf()) {
+      rest();
       return;
     }
 
-    const io = new IntersectionObserver(([e]) => {
+    io = new IntersectionObserver(([e]) => {
       if (manual.current) return;
       if (e.isIntersecting) player.play();
       else player.pause();
@@ -53,8 +62,13 @@ export function Scene<P extends Record<string, unknown>>({ component, inputProps
       zone.current.style.left = `${posAt(e.detail.frame) * 100}%`;
     };
     player.addEventListener("frameupdate", onFrame);
+    window.addEventListener("perf:low", rest);
 
-    return () => { io.disconnect(); player.removeEventListener("frameupdate", onFrame); };
+    return () => {
+      io?.disconnect();
+      player.removeEventListener("frameupdate", onFrame);
+      window.removeEventListener("perf:low", rest);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [still, posAt]);
 
@@ -124,7 +138,7 @@ export function Scene<P extends Record<string, unknown>>({ component, inputProps
             style={{ left: `${shown * 100}%` }}
           />
           {pos === null && (
-            <span aria-hidden="true" className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-ink/80 px-3 py-1 text-xs text-paper">
+            <span aria-hidden="true" className="hint pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-ink/80 px-3 py-1 text-xs text-paper">
               Drag the divider
             </span>
           )}

@@ -1,9 +1,14 @@
 import {
-  ArrowRight, Boxes, CalendarCheck, ChartColumn, CircleCheck, CircleX, Clock, Copy, HardHat, Hammer, KeyRound, LayoutDashboard, LifeBuoy,
-  MessagesSquare, PencilRuler, Plug, Plus, Puzzle, Rocket, Search, Sheet, Target, Unplug, UserCheck, UserRoundCheck, Workflow, Wrench, Zap,
+  ArrowRight, Boxes, CalendarCheck, ChartColumn, CircleCheck, CircleX, Clock, Cloud, Copy, HardHat, Hammer, Hash, KeyRound, LayoutDashboard, LifeBuoy,
+  Mail, MessagesSquare, PencilRuler, Plug, Plus, Puzzle, Rocket, Search, Sheet, ShoppingBag, Target, Unplug, UserCheck, UserRoundCheck, Users, Wallet, Workflow, Wrench, Zap,
   type LucideIcon
 } from "lucide-react";
-import { SiGmail, SiGooglesheets, SiMessenger, SiNotion, SiQuickbooks, SiStripe, SiViber, SiWhatsapp } from "@icons-pack/react-simple-icons";
+import {
+  SiAirtable, SiAsana, SiBrevo, SiCalendly, SiClickup, SiDropbox, SiFacebook, SiGmail, SiGoogleads, SiGoogleanalytics, SiGooglecalendar, SiGoogledrive,
+  SiGoogledocs, SiGoogleforms, SiGooglemeet, SiGooglesheets, SiHubspot, SiInstagram, SiIntercom, SiJira, SiMailchimp, SiMessenger, SiNotion, SiOdoo,
+  SiPaypal, SiQuickbooks, SiShopee, SiShopify, SiStripe, SiTelegram, SiTiktok, SiTrello, SiViber, SiWhatsapp, SiWise, SiWoocommerce, SiWordpress,
+  SiXendit, SiXero, SiZapier, SiZendesk, SiZoho, SiZoom
+} from "@icons-pack/react-simple-icons";
 import type { ComponentType } from "react";
 import { site } from "@/lib/site";
 import { wrap } from "@/lib/ui";
@@ -42,7 +47,6 @@ const heroFacts: [LucideIcon, string][] = [
 export function Hero() {
   return (
     <section id="top" className="relative pb-14 pt-12 sm:pt-14 lg:pb-16 lg:pt-16">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-128" style={{ background: "radial-gradient(60% 70% at 50% 0%, var(--brand-soft), transparent 70%)" }} />
       <div className={wrap}>
         <div className="grid grid-cols-1 items-end gap-6 lg:grid-cols-[1.2fr_.8fr] lg:gap-12">
           <h1 className="display rise text-balance text-[clamp(2.1rem,4.6vw,3.9rem)] leading-[1.02]">We build custom software around your business.</h1>
@@ -51,7 +55,7 @@ export function Hero() {
               AcquisiFlow is a software studio in the Philippines. We study how your team works, then build one system to replace your spreadsheets and disconnected tools.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href="#contact" className="btn">Start a project<ArrowRight size={16} aria-hidden="true" /></a>
+              <a href="#contact" className="btn">Start a project<ArrowRight size={16} aria-hidden="true" className="btn-arrow" /></a>
               <a href="#lab" className="btn btn-line">See the concept systems</a>
             </div>
           </div>
@@ -72,7 +76,36 @@ export function Hero() {
           ))}
         </div>
       </div>
+      <Marquee />
     </section>
+  );
+}
+
+const strip: [string, BrandIcon, string][] = [
+  ["Google Sheets", SiGooglesheets, "default"], ["Gmail", SiGmail, "default"], ["Messenger", SiMessenger, "default"], ["Viber", SiViber, "default"],
+  ["WhatsApp", SiWhatsapp, "default"], ["Notion", SiNotion, "currentColor"], ["Stripe", SiStripe, "default"], ["QuickBooks", SiQuickbooks, "default"],
+  ["Shopify", SiShopify, "default"], ["HubSpot", SiHubspot, "default"], ["Airtable", SiAirtable, "default"], ["Zapier", SiZapier, "default"],
+  ["Shopee", SiShopee, "default"], ["Telegram", SiTelegram, "default"]
+];
+
+function Marquee() {
+  return (
+    <div className="rise rise-3 mt-12">
+      <p className="mb-5 text-center text-sm text-quiet">Connects with the tools your team already uses</p>
+      <div data-anim className="marquee" role="group" aria-label="Tools we connect to your system">
+        <div className="marquee-track">
+          {[false, true].map((copy) => (
+            <div key={String(copy)} className="marquee-group" aria-hidden={copy || undefined}>
+              {strip.map(([name, Icon, color]) => (
+                <span key={name} className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-line-strong bg-card px-4 py-2 text-sm text-ink">
+                  <Icon size={16} color={color} aria-hidden="true" />{name}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -162,16 +195,35 @@ const services: [LucideIcon, string, string][] = [
 ];
 
 type BrandIcon = ComponentType<{ color?: string; size?: number | string; className?: string; "aria-hidden"?: boolean | "true" | "false" }>;
+type Logo = [name: string, icon: BrandIcon, color: string];
 
-const logos: [string, BrandIcon, string][] = [
-  ["Google Sheets", SiGooglesheets, "default"],
-  ["Gmail", SiGmail, "default"],
-  ["Notion", SiNotion, "currentColor"],
-  ["Messenger", SiMessenger, "default"],
-  ["Viber", SiViber, "default"],
-  ["WhatsApp", SiWhatsapp, "default"],
-  ["QuickBooks", SiQuickbooks, "default"],
-  ["Stripe", SiStripe, "default"]
+const D = "default", K = "currentColor";
+
+const integrations: { title: string; items: Logo[] }[] = [
+  {
+    title: "Messaging and calls",
+    items: [["Gmail", SiGmail, D], ["Outlook", Mail, K], ["Messenger", SiMessenger, D], ["Viber", SiViber, D], ["WhatsApp", SiWhatsapp, D], ["Telegram", SiTelegram, D], ["Slack", Hash, K], ["Microsoft Teams", Users, K], ["Zoom", SiZoom, D], ["Google Meet", SiGooglemeet, D]]
+  },
+  {
+    title: "Files, data, and calendars",
+    items: [["Google Sheets", SiGooglesheets, D], ["Google Docs", SiGoogledocs, D], ["Google Forms", SiGoogleforms, D], ["Google Drive", SiGoogledrive, D], ["Google Calendar", SiGooglecalendar, D], ["Microsoft Excel", Sheet, K], ["Notion", SiNotion, K], ["Airtable", SiAirtable, D], ["Dropbox", SiDropbox, D]]
+  },
+  {
+    title: "Payments and accounting",
+    items: [["Stripe", SiStripe, D], ["PayPal", SiPaypal, D], ["QuickBooks", SiQuickbooks, D], ["Xero", SiXero, D], ["Wise", SiWise, D], ["Xendit", SiXendit, D], ["GCash", Wallet, K], ["Maya", Wallet, K], ["PayMongo", Wallet, K]]
+  },
+  {
+    title: "Sales, marketing, and support",
+    items: [["HubSpot", SiHubspot, D], ["Zoho", SiZoho, D], ["Salesforce", Cloud, K], ["Mailchimp", SiMailchimp, D], ["Brevo", SiBrevo, D], ["Facebook", SiFacebook, D], ["Instagram", SiInstagram, D], ["TikTok", SiTiktok, K], ["Google Ads", SiGoogleads, D], ["Google Analytics", SiGoogleanalytics, D], ["Calendly", SiCalendly, D], ["Intercom", SiIntercom, D], ["Zendesk", SiZendesk, K]]
+  },
+  {
+    title: "Online stores and websites",
+    items: [["Shopify", SiShopify, D], ["WooCommerce", SiWoocommerce, D], ["WordPress", SiWordpress, D], ["Shopee", SiShopee, D], ["Lazada", ShoppingBag, K]]
+  },
+  {
+    title: "Projects and automation",
+    items: [["Asana", SiAsana, D], ["Trello", SiTrello, D], ["Jira", SiJira, D], ["ClickUp", SiClickup, D], ["Odoo", SiOdoo, D], ["Zapier", SiZapier, D]]
+  }
 ];
 
 export function Services() {
@@ -191,16 +243,26 @@ export function Services() {
           ))}
         </div>
 
-        <div className="mt-12 border-t border-line pt-8">
-          <p className="text-sm text-body">Examples of tools we can connect to your system</p>
-          <ul className="mt-5 flex flex-wrap gap-2.5">
-            {logos.map(([name, Icon, color]) => (
-              <li key={name} className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-card px-3.5 py-1.5 text-sm text-ink">
-                <Icon size={16} color={color} aria-hidden="true" />{name}
-              </li>
+        <div className="mt-12 border-t border-line pt-10">
+          <div className="grid grid-cols-1 items-end gap-3 lg:grid-cols-[1.3fr_.7fr] lg:gap-12">
+            <h3 className="display text-2xl leading-tight sm:text-3xl">The applications we connect to your system</h3>
+            <p className="max-w-md text-sm leading-6 text-body">These are the business tools most teams already run. If your tool has an API or can export data, we can connect it.</p>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {integrations.map(({ title, items }) => (
+              <div key={title} className="rounded-2xl border border-line bg-card p-5">
+                <h4 className="display text-base leading-tight">{title}</h4>
+                <ul className="mt-4 flex flex-wrap gap-2">
+                  {items.map(([name, Icon, color]) => (
+                    <li key={name} className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-line-strong bg-secondary px-3 py-1 text-[13px] text-ink">
+                      <Icon size={15} color={color} aria-hidden="true" />{name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
-          <p className="mt-4 text-xs text-quiet">Logos belong to their owners. Listing a tool does not imply affiliation or endorsement.</p>
+          </div>
+          <p className="mt-5 text-xs text-quiet">Logos belong to their owners. Listing a tool does not imply affiliation or endorsement.</p>
         </div>
       </div>
     </section>
@@ -224,10 +286,10 @@ export function Process() {
         </Head>
         <div className="mt-10 rounded-2xl border border-line bg-card p-3 sm:p-5">
           <div className="hidden lg:block">
-            <Scene component={ProcessScene} width={1180} height={360} frames={PROCESS_FRAMES} still={140} label="Flowchart: understand, design, build, launch, support" />
+            <Scene component={ProcessScene} width={1180} height={360} frames={PROCESS_FRAMES} still={170} label="Flowchart: understand, design, build, launch, support" />
           </div>
           <div className="mx-auto max-w-sm lg:hidden">
-            <Scene component={ProcessScene} inputProps={{ vertical: true }} width={520} height={720} frames={PROCESS_FRAMES} still={140} label="Flowchart: understand, design, build, launch, support" />
+            <Scene component={ProcessScene} inputProps={{ vertical: true }} width={520} height={720} frames={PROCESS_FRAMES} still={170} label="Flowchart: understand, design, build, launch, support" />
           </div>
         </div>
         <ol className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5 lg:gap-6">
@@ -347,7 +409,6 @@ export function Contact() {
     <section id="contact" className="py-14 lg:py-20">
       <div className={wrap}>
         <div className="relative overflow-hidden rounded-3xl border border-line bg-card p-[clamp(1.25rem,4vw,3rem)] shadow-[0_36px_80px_-60px_rgba(0,0,0,.4)]">
-          <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full" style={{ background: "radial-gradient(closest-side, var(--brand-soft), transparent)" }} />
           <div className="relative grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1fr] lg:gap-14">
             <div>
               <h2 className="h2">Tell us what your business has outgrown</h2>
