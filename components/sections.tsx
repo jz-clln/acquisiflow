@@ -13,7 +13,10 @@ import type { ComponentType } from "react";
 import { site } from "@/lib/site";
 import { wrap } from "@/lib/ui";
 import { Scene } from "@/components/scene";
-import { JobsScene, ConceptScene, ProcessScene, ToolsScene, JOBS_FRAMES, CONCEPT_FRAMES, PROCESS_FRAMES, TOOLS_FRAMES, jobsPos } from "@/components/scenes";
+import {
+  HeroScene, ConceptScene, ProcessScene, ToolsScene, BookingScene, DashboardScene, DirectScene,
+  HERO_FRAMES, CONCEPT_FRAMES, PROCESS_FRAMES, TOOLS_FRAMES, BOOKING_FRAMES, DASH_FRAMES, DIRECT_FRAMES
+} from "@/components/scenes";
 import { ContactForm, CopyEmail } from "@/components/contact-form";
 
 function Head({ title, children }: { title: string; children?: React.ReactNode }) {
@@ -65,10 +68,15 @@ export function Hero() {
         <div className="rise rise-3 mx-auto mt-10 max-w-4xl">
           <div className="overflow-hidden rounded-2xl border border-line bg-card p-1.5 shadow-[0_40px_80px_-56px_rgba(0,0,0,.45)] sm:p-2.5">
             <div className="overflow-hidden rounded-xl">
-              <Scene component={JobsScene} posAt={jobsPos} width={960} height={480} frames={JOBS_FRAMES} still={140} label="Animation: a spreadsheet of jobs turns into a jobs system" />
+              <div className="hidden sm:block">
+                <Scene component={HeroScene} width={960} height={384} frames={HERO_FRAMES} still={188} label="Animation: customer messages from chat apps and email become scheduled jobs in one system" />
+              </div>
+              <div className="mx-auto max-w-sm sm:hidden">
+                <Scene component={HeroScene} inputProps={{ compact: true }} width={380} height={404} frames={HERO_FRAMES} still={188} label="Animation: customer messages from chat apps and email become scheduled jobs in one system" />
+              </div>
             </div>
           </div>
-          <p className="mt-3 text-center text-sm text-quiet">Example data. Drag the divider to compare the spreadsheet with the jobs system.</p>
+          <p className="mt-3 text-center text-sm text-quiet">Example data. Every message becomes a scheduled job without anyone retyping it.</p>
         </div>
 
         <div className="rise rise-3 mx-auto mt-10 grid max-w-4xl grid-cols-1 gap-4 border-t border-line pt-6 text-sm text-body sm:grid-cols-3 sm:gap-8">
@@ -244,6 +252,27 @@ export function Services() {
           ))}
         </div>
 
+        <div className="mx-auto mt-4 grid max-w-2xl grid-cols-1 gap-4 xl:max-w-none xl:grid-cols-2">
+          <figure className="rounded-2xl border border-line bg-card p-2 sm:p-3">
+            <div className="hidden sm:block">
+              <Scene component={BookingScene} width={640} height={372} frames={BOOKING_FRAMES} still={200} label="Animation: a customer books online and the job appears in the team schedule" />
+            </div>
+            <div className="mx-auto max-w-sm sm:hidden">
+              <Scene component={BookingScene} inputProps={{ compact: true }} width={360} height={636} frames={BOOKING_FRAMES} still={200} label="Animation: a customer books online and the job appears in the team schedule" />
+            </div>
+            <figcaption className="mt-2 text-center text-sm text-quiet">Illustration. A customer books online and the job lands in your schedule.</figcaption>
+          </figure>
+          <figure className="rounded-2xl border border-line bg-card p-2 sm:p-3">
+            <div className="hidden sm:block">
+              <Scene component={DashboardScene} width={640} height={350} frames={DASH_FRAMES} still={200} label="Animation: a dashboard updates as a new job arrives" />
+            </div>
+            <div className="mx-auto max-w-sm sm:hidden">
+              <Scene component={DashboardScene} inputProps={{ compact: true }} width={360} height={292} frames={DASH_FRAMES} still={200} label="Animation: a dashboard updates as a new job arrives" />
+            </div>
+            <figcaption className="mt-2 text-center text-sm text-quiet">Example data. Your dashboard updates the moment a job changes.</figcaption>
+          </figure>
+        </div>
+
         <div className="mt-12 border-t border-line pt-10">
           <div className="grid grid-cols-1 items-end gap-3 lg:grid-cols-[1.3fr_.7fr] lg:gap-12">
             <h3 className="display text-2xl leading-tight sm:text-3xl">The applications we connect to your system</h3>
@@ -358,6 +387,15 @@ export function About() {
         <Head title="The founder who scopes your system stays on it">
           AcquisiFlow is small by choice. The founder leads discovery, planning, and quality review, so your decisions reach the people building the system with no account manager in between.
         </Head>
+        <figure className="mx-auto mt-10 max-w-2xl rounded-2xl border border-line bg-card p-2 sm:p-3">
+          <div className="hidden sm:block">
+            <Scene component={DirectScene} width={640} height={378} frames={DIRECT_FRAMES} still={210} label="Animation: the same request passes through four hand-offs at an agency and two with the founder" />
+          </div>
+          <div className="mx-auto max-w-sm sm:hidden">
+            <Scene component={DirectScene} inputProps={{ compact: true }} width={360} height={340} frames={DIRECT_FRAMES} still={210} label="Animation: the same request passes through four hand-offs at an agency and two with the founder" />
+          </div>
+          <figcaption className="mt-2 text-center text-sm text-quiet">Illustration. The same request, passed along two different ways.</figcaption>
+        </figure>
         <dl className="mt-10 grid grid-cols-1 gap-x-10 sm:grid-cols-2">
           {principles.map(([Icon, t, d]) => (
             <div key={t} className="border-t border-ink pb-8 pt-5">

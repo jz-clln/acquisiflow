@@ -1,68 +1,158 @@
 "use client";
 
 import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { CalendarDays, Hammer, LifeBuoy, PencilRuler, Rocket, Search, Users, Wrench, type LucideIcon } from "lucide-react";
+import { Boxes, Briefcase, CalendarDays, CircleCheck, CircleX, ClipboardList, Code, Hammer, LifeBuoy, PencilRuler, Rocket, Search, User, UserCheck, Users, Wallet, Wrench, type LucideIcon } from "lucide-react";
 import { SiGmail, SiGooglesheets, SiMessenger, SiNotion, SiViber } from "@icons-pack/react-simple-icons";
-import type { ReactElement } from "react";
+import type { ComponentType, ReactElement } from "react";
 
 const font = "var(--font-instrument), system-ui, sans-serif";
-const sheet = [["1842", "Reyes Aircon", "Ben", "done?"], ["1843", "M. Santos", "", ""], ["1844", "Dela Cruz Bldg", "Ana", "sched"], ["1845", "Reyes aircon", "ben", "2nd visit?"], ["1846", "Lim Hardware", "", "new"]];
-const system = [["1842", "Reyes Aircon", "Ben", "Completed"], ["1843", "M. Santos", "Unassigned", "New"], ["1844", "Dela Cruz Bldg", "Ana", "Scheduled"], ["1845", "Reyes Aircon", "Ben", "Scheduled"], ["1846", "Lim Hardware", "Unassigned", "New"]];
-const cols = [130, 340, 230, 260];
-const TOP = 80, ROW = 80;
+/* ------------------------------------------------------------------ */
+/* Hero: messages arrive in chat apps and become scheduled jobs        */
+/* ------------------------------------------------------------------ */
 
-const pill = (s: string) =>
-  s === "Completed" ? { border: "1.5px solid transparent", background: "var(--brand-soft)", color: "var(--brand)" }
-  : s === "New" ? { border: "1.5px solid var(--brand)", color: "var(--brand)" }
-  : { border: "1.5px solid var(--border-strong)", color: "var(--foreground)" };
+export const HERO_FRAMES = 300;
 
-export const JOBS_FRAMES = 240;
+export type HeroProps = { compact?: boolean };
 
-export type JobsProps = { pos?: number };
+type MsgIcon = ComponentType<{ size?: number; color?: string }>;
 
-/** Divider position (0 to 1) at a given frame of the automatic sweep. */
-export const jobsPos = (f: number) => interpolate(f, [0, 40, 110, 190, 240], [1, 1, 0.3, 0.3, 1], { easing: Easing.inOut(Easing.cubic) });
+const heroJobs: { icon: MsgIcon; app: string; text: string; name: string; sub: string; tech: string; time: string }[] = [
+  { icon: SiMessenger, app: "Messenger", text: "Pa-check po ng aircon bukas, Reyes Bldg.", name: "Reyes Aircon", sub: "Aircon check", tech: "Ben", time: "10:00" },
+  { icon: SiViber, app: "Viber", text: "Urgent: tumutulo ang tubo sa Lim Hardware!", name: "Lim Hardware", sub: "Pipe repair", tech: "Ana", time: "11:30" },
+  { icon: SiGmail, app: "Email", text: "Quote for 3 units, Dela Cruz Bldg please.", name: "Dela Cruz", sub: "Quote, 3 units", tech: "Ben", time: "1:30" }
+];
+const hm = (j: number) => 16 + j * 64;
+const hSched = (j: number) => hm(j) + 60;
+const hDone = [190, 214, 238];
+const heroCols = ["New", "Scheduled", "Done"];
 
-export function JobsScene({ pos }: JobsProps) {
+/** Canvas: wide 960 x 384, compact 380 x 404. */
+export function HeroScene({ compact = false }: HeroProps) {
   const f = useCurrentFrame();
-  const x = pos ?? jobsPos(f);
-  const assigned = f >= 131;
-  const rowsNow = system.map((r) => (assigned && r[0] === "1843" ? [r[0], r[1], "Ben", "Scheduled"] : r));
-  const cell = (i: number): React.CSSProperties => ({ width: cols[i], padding: "0 22px", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" });
+  const out = interpolate(f, [280, 298], [1, 0], C);
+  const ease = { ...C, easing: Easing.inOut(Easing.cubic) };
+
+  const P = 8;
+  const W = compact ? 380 : 960;
+  const hdr = compact ? 36 : 48;
+  const colHdr = compact ? 24 : 28;
+  const pitch = compact ? 74 : 96;
+  const cardH = compact ? 68 : 88;
+  const bPad = compact ? 10 : 12;
+  const boardX = compact ? P : 344;
+  const boardW = compact ? W - 2 * P : 608;
+  const boardTop = compact ? 110 : P;
+  const rowsH = 2 * pitch + cardH;
+  const boardH = hdr + colHdr + rowsH + bPad;
+  const H = boardTop + boardH + P;
+  const ip = compact ? 8 : 12;
+  const colGap = compact ? 4 : 10;
+  const colW = (boardW - 2 * ip - 2 * colGap) / 3;
+  const cardW = colW - (compact ? 6 : 12);
+  const colX = (c: number) => boardX + ip + c * (colW + colGap);
+  const cardLeft = (c: number) => colX(c) + (colW - cardW) / 2;
+  const rowsTop = boardTop + hdr + colHdr;
+  const rowY = (j: number) => rowsTop + j * pitch;
+  const created = heroJobs.filter((_, j) => f >= hm(j) + 38).length;
+
+  const panel: React.CSSProperties = { position: "absolute", boxSizing: "border-box", borderRadius: compact ? 20 : 24, border: "2px solid var(--border-strong)", background: "var(--surface)", overflow: "hidden", opacity: out };
+  const head: React.CSSProperties = { position: "absolute", left: 0, right: 0, top: 0, height: hdr, boxSizing: "border-box", padding: compact ? "0 12px" : "0 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, borderBottom: "1px solid var(--border)", whiteSpace: "nowrap" };
+  const headTitle: React.CSSProperties = { fontFamily: display, fontWeight: 700, fontSize: compact ? 15 : 19, letterSpacing: "-0.02em" };
+
+  const beam = (j: number): number[][] => {
+    const y = rowY(j) + cardH / 2;
+    if (!compact) return [[280, y], [304, y], [336, y], [cardLeft(0), y]];
+    const ex = cardLeft(0) + cardW / 2;
+    const ey = rowY(j);
+    return [[W / 2, P + 76], [W / 2, P + 90], [ex, ey - 30], [ex, ey]];
+  };
+
   return (
-    <AbsoluteFill style={{ background: "var(--surface)", fontFamily: font, fontSize: 26, color: "var(--foreground)" }}>
-      <div style={{ position: "absolute", inset: 0, fontFamily: "Arial, Helvetica, sans-serif" }}>
-        <div style={{ height: TOP, display: "flex", alignItems: "center", padding: "0 26px", background: "var(--surface-soft)", color: "var(--muted)", borderBottom: "1px solid var(--border)" }}>Spreadsheet</div>
-        {sheet.map((r, i) => (
-          <div key={i} style={{ display: "flex", height: ROW, alignItems: "center", borderBottom: "1px solid var(--border)" }}>
-            {r.map((c, j) => <div key={j} style={{ ...cell(j), borderRight: "1px solid var(--border)", height: "100%", lineHeight: `${ROW}px` }}>{c}</div>)}
+    <AbsoluteFill style={{ fontFamily: font, color: "var(--foreground)" }}>
+      {!compact && (
+        <div style={{ ...panel, left: P, top: boardTop, width: 280, height: boardH }}>
+          <div style={head}>
+            <span style={headTitle}>Messages</span>
+            <span style={{ fontSize: 13, color: "var(--muted)" }}>Chats and email</span>
           </div>
-        ))}
-      </div>
-      <div style={{ position: "absolute", inset: 0, background: "var(--surface)", clipPath: `inset(0 0 0 ${x * 100}%)` }}>
-        <div style={{ height: TOP, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 26px", background: "var(--surface-soft)", borderBottom: "1px solid var(--border)" }}>
-          <b>Jobs system</b><span style={{ color: "var(--brand)", fontSize: 22 }}>{assigned ? "1 needs a technician" : "2 need a technician"}</span>
         </div>
-        {rowsNow.map((r, i) => (
-          <div key={i} style={{ display: "flex", height: ROW, alignItems: "center", borderBottom: "1px solid var(--border)" }}>
-            {r.map((c, j) => (
-              <div key={j} style={{ ...cell(j), overflow: j === 3 ? "visible" : "hidden", color: j === 2 && c === "Unassigned" ? "var(--foreground)" : j === 2 ? "var(--secondary)" : undefined, fontWeight: j === 2 && c === "Unassigned" ? 700 : 400 }}>
-                {j === 3 ? <span style={{ ...pill(c), display: "inline-block", boxSizing: "border-box", borderRadius: 999, padding: "0 20px", lineHeight: "38px", fontSize: 21 }}>{c}</span> : c}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-      <div style={{ position: "absolute", top: 0, bottom: 0, left: `${x * 100}%`, width: 4, marginLeft: -2, background: "var(--brand)" }}>
-        <div style={{ position: "absolute", top: "50%", left: "50%", width: 60, height: 60, marginTop: -30, marginLeft: -30, borderRadius: 999, background: "var(--brand)", color: "var(--on-brand)", display: "grid", placeItems: "center", fontSize: 22, boxShadow: "0 8px 24px rgba(0,0,0,.25)" }}>‹ ›</div>
-      </div>
-      {pos === undefined && (
-        <Cursor
-          clicks={[36, 130]}
-          holds={[[36, 110]]}
-          stops={[[6, 900, 430], [34, 944, 244], [40, 944, 240], [110, 272, 240], [116, 272, 240], [128, 560, 204], [140, 560, 204], [176, 700, 330], [186, 900, 440]]}
-        />
       )}
+
+      <div style={{ ...panel, left: boardX, top: boardTop, width: boardW, height: boardH }}>
+        <div style={head}>
+          <span style={headTitle}>Jobs system</span>
+          <span style={{ fontSize: compact ? 12 : 15, color: "var(--brand)" }}>{created === 1 ? "1 job today" : `${created} jobs today`}</span>
+        </div>
+      </div>
+
+      {heroCols.map((name, c) => (
+        <div key={name} style={{ opacity: out }}>
+          <div style={{ position: "absolute", left: colX(c), top: boardTop + hdr, width: colW, height: boardH - hdr - 6, borderRadius: compact ? 12 : 16, background: "var(--surface-soft)" }} />
+          <div style={{ position: "absolute", left: cardLeft(c), top: boardTop + hdr, height: colHdr, lineHeight: `${colHdr}px`, fontSize: compact ? 12 : 14, color: "var(--secondary)", whiteSpace: "nowrap" }}>{name}</div>
+        </div>
+      ))}
+
+      {heroJobs.map((job, j) => {
+        const m = hm(j);
+        const Icon = job.icon;
+        const arrive = interpolate(f, [m, m + 10], [0, 1], C);
+        const replied = !compact && f >= hSched(j) + 10;
+        const vis = compact ? interpolate(f, [m, m + 8, m + 46, m + 56], [0, 1, 1, 0], C) : arrive * interpolate(f, [m + 40, m + 54], [1, 0.7], C);
+        const pos: React.CSSProperties = compact ? { left: P, top: P, width: W - 2 * P, height: 76 } : { left: 16, top: rowY(j), width: 264, height: cardH };
+        return (
+          <div key={job.app} style={{ position: "absolute", ...pos, boxSizing: "border-box", borderRadius: compact ? 16 : 18, border: "1.5px solid var(--border-strong)", background: "var(--surface)", padding: "8px 12px", display: "flex", alignItems: "center", gap: 10, overflow: "hidden", opacity: vis * out, transform: compact ? `translateY(${(1 - arrive) * -8}px)` : `translateX(${(1 - arrive) * -14}px)` }}>
+            <span style={{ display: "grid", placeItems: "center", flexShrink: 0, width: 32, height: 32, borderRadius: 10, background: "var(--surface-soft)" }}><Icon size={20} color="default" /></span>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, lineHeight: "16px", color: replied ? "var(--brand)" : "var(--secondary)", whiteSpace: "nowrap" }}>
+                {replied && <CircleCheck size={14} strokeWidth={2} style={{ flexShrink: 0 }} />}
+                {replied ? `Confirmed for ${job.time}` : job.app}
+              </div>
+              <div style={{ marginTop: 2, fontSize: compact ? 14 : 15, lineHeight: compact ? "18px" : "19px", height: compact ? 36 : 38, overflow: "hidden" }}>{job.text}</div>
+            </div>
+          </div>
+        );
+      })}
+
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute", inset: 0 }}>
+        {heroJobs.map((_, j) => {
+          const m = hm(j);
+          const pts = beam(j);
+          const p = interpolate(f, [m + 20, m + 40], [0, 1], ease);
+          const u = 1 - p;
+          const bz = (k: number) => u * u * u * pts[0][k] + 3 * u * u * p * pts[1][k] + 3 * u * p * p * pts[2][k] + p * p * p * pts[3][k];
+          const d = `M ${pts[0][0]} ${pts[0][1]} C ${pts[1][0]} ${pts[1][1]} ${pts[2][0]} ${pts[2][1]} ${pts[3][0]} ${pts[3][1]}`;
+          const pathOp = interpolate(f, [m + 20, m + 24, m + 50, m + 62], [0, 1, 1, 0], C) * out;
+          const dotOp = interpolate(f, [m + 20, m + 24, m + 36, m + 42], [0, 1, 1, 0], C) * out;
+          return (
+            <g key={j} fill="none" stroke="var(--brand)" strokeWidth={3} strokeLinecap="round">
+              <path d={d} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - p} opacity={pathOp} />
+              <circle cx={bz(0)} cy={bz(1)} r={6} fill="var(--brand)" stroke="none" opacity={dotOp} />
+            </g>
+          );
+        })}
+      </svg>
+
+      {heroJobs.map((job, j) => {
+        const m = hm(j);
+        const c = interpolate(f, [hSched(j), hSched(j) + 18, hDone[j], hDone[j] + 18], [0, 1, 1, 2], ease);
+        const state = f < hSched(j) + 9 ? 0 : f < hDone[j] + 9 ? 1 : 2;
+        const op = interpolate(f, [m + 38, m + 48], [0, 1], C);
+        const chip = state === 0 ? "Unassigned" : state === 1 ? `${job.tech} \u00b7 ${job.time}` : `Done \u00b7 ${job.tech}`;
+        const chipStyle: React.CSSProperties =
+          state === 0 ? { border: "1.5px solid var(--brand)", color: "var(--brand)", fontWeight: 700 }
+          : state === 1 ? { border: "1.5px solid var(--border-strong)", color: "var(--foreground)" }
+          : { border: "1.5px solid transparent", background: "var(--brand)", color: "var(--on-brand)" };
+        const ch = compact ? 18 : 22;
+        return (
+          <div key={job.name} style={{ position: "absolute", left: cardLeft(0) + c * (colW + colGap), top: rowY(j), width: cardW, height: cardH, boxSizing: "border-box", borderRadius: compact ? 14 : 18, border: `1.5px solid ${state === 0 ? "var(--brand)" : state === 1 ? "var(--border-strong)" : "transparent"}`, background: state === 2 ? "var(--brand-soft)" : "var(--surface)", padding: compact ? "6px 8px" : "8px 12px", display: "flex", flexDirection: "column", justifyContent: "center", overflow: "hidden", opacity: op * out, transform: `scale(${0.92 + 0.08 * op})` }}>
+            <div style={{ fontFamily: display, fontWeight: 700, fontSize: compact ? 12 : 16, lineHeight: compact ? "16px" : "20px", letterSpacing: "-0.02em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{job.name}</div>
+            <div style={{ fontSize: compact ? 11 : 14, lineHeight: compact ? "14px" : "18px", color: "var(--secondary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{job.sub}</div>
+            <div style={{ marginTop: compact ? 2 : 4 }}>
+              <span style={{ ...chipStyle, display: "inline-block", maxWidth: "100%", boxSizing: "border-box", height: ch, lineHeight: `${ch - 3}px`, padding: compact ? "0 7px" : "0 10px", borderRadius: 999, fontSize: compact ? 11 : 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", verticalAlign: "top" }}>{chip}</span>
+            </div>
+          </div>
+        );
+      })}
     </AbsoluteFill>
   );
 }
@@ -168,10 +258,29 @@ export function ProcessScene({ vertical = false }: ProcessProps) {
         {!vertical && (() => {
           const a = at(1), b = at(2);
           const c1 = a.x + nw / 2, c2 = b.x + nw / 2, yb = y0 + nh;
+
+          // Loop doodle: draws in, arrowhead fades in, then a dot keeps travelling along the curve.
+          const P0 = { x: c2, y: yb + 6 }, P1 = { x: c2, y: yb + 96 }, P2 = { x: c1, y: yb + 96 }, P3 = { x: c1, y: yb + 18 };
+          const bez = (t: number) => {
+            const u = 1 - t;
+            return {
+              x: u * u * u * P0.x + 3 * u * u * t * P1.x + 3 * u * t * t * P2.x + t * t * t * P3.x,
+              y: u * u * u * P0.y + 3 * u * u * t * P1.y + 3 * u * t * t * P2.y + t * t * t * P3.y
+            };
+          };
+          const PASS = 30;
+          const dt = f < 156 ? 0 : ((f - 156) % PASS) / PASS;
+          const dot = bez(Easing.inOut(Easing.cubic)(dt));
+          const dotOp = interpolate(f, [156, 162], [0, 1], C) * interpolate(dt, [0, 0.12, 0.88, 1], [0, 1, 1, 0], C);
+          const headOp = interpolate(f, [148, 158], [0, 1], C);
+          const glow = 0.5 + 0.5 * Math.sin(f / 5);
+
           return (
             <g opacity={out} stroke="var(--brand)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" fill="none">
-              <path d={`M ${c2} ${yb + 6} C ${c2} ${yb + 96} ${c1} ${yb + 96} ${c1} ${yb + 18}`} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - loop} />
-              <path d={`M ${c1 - 8} ${yb + 28} L ${c1} ${yb + 16} L ${c1 + 8} ${yb + 28}`} opacity={loop >= 1 ? 1 : 0} />
+              <path d={`M ${P0.x} ${P0.y} C ${P1.x} ${P1.y} ${P2.x} ${P2.y} ${P3.x} ${P3.y}`} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - loop} />
+              <path d={`M ${c1 - 8} ${yb + 28} L ${c1} ${yb + 16} L ${c1 + 8} ${yb + 28}`} opacity={headOp} />
+              <circle cx={dot.x} cy={dot.y} r={9 + 3 * glow} fill="var(--brand)" stroke="none" opacity={dotOp * 0.25} />
+              <circle cx={dot.x} cy={dot.y} r={5} fill="var(--brand)" stroke="none" opacity={dotOp} />
               <text x={(c1 + c2) / 2} y={yb + 122} textAnchor="middle" fontSize={20} fill="var(--secondary)" stroke="none" fontFamily={font} opacity={interpolate(f, [150, 166], [0, 1], C)}>
                 Each iteration is reviewed with you
               </text>
@@ -291,6 +400,282 @@ export function ToolsScene() {
       <div style={{ position: "absolute", left: 20, bottom: 6, fontSize: 24, color: "var(--secondary)", opacity: out }}>
         <span style={{ position: "absolute", whiteSpace: "nowrap", opacity: interpolate(f, [0, 12, 68, 84], [0, 1, 1, 0], C) }}>Five tools, five versions of the truth.</span>
         <span style={{ position: "absolute", whiteSpace: "nowrap", opacity: interpolate(f, [92, 108], [0, 1], C) }}>One system, one version.</span>
+      </div>
+    </AbsoluteFill>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Booking: a customer books online and the job lands in the schedule  */
+/* ------------------------------------------------------------------ */
+
+export const BOOKING_FRAMES = 240;
+
+export type BookingProps = { compact?: boolean };
+
+const bookingFields: [string, string, number][] = [["Service", "Aircon repair", 10], ["Date", "Tue, Oct 14", 26], ["Time", "10:00 AM", 40]];
+const bookingChips: [string, number][] = [["Booking confirmed", 104], ["Customer notified", 136], ["Invoice paid", 176]];
+
+/** Canvas: wide 640 x 372, compact 360 x 636. */
+export function BookingScene({ compact = false }: BookingProps) {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const out = interpolate(f, [222, 238], [1, 0], C);
+  const a = spring({ frame: f, fps, config: { damping: 200 } });
+  const b = spring({ frame: f - 8, fps, config: { damping: 200 } });
+  const block = spring({ frame: f - 90, fps, config: { damping: 200 } });
+  const press = f >= 78 && f < 84;
+
+  const pad = compact ? 16 : 18;
+  const CW = compact ? 344 : 280;
+  const H1 = compact ? 288 : 356;
+  const H2 = compact ? 296 : 356;
+  const x2 = compact ? 8 : 352;
+  const y2 = compact ? 8 + H1 + 36 : 8;
+  const W = compact ? 360 : 640;
+  const H = compact ? y2 + H2 + 8 : 8 + H1 + 8;
+  const slotH = compact ? 40 : 42;
+  const hours = compact ? ["9:00", "10:00", "11:00"] : ["9:00", "10:00", "11:00", "12:00"];
+  const bx = 8 + CW / 2;
+  const by = 8 + H1 - 2 - pad - (compact ? 22 : 23);
+  const pts: number[][] = compact
+    ? [[bx, 8 + H1], [bx, 8 + H1 + 12], [bx, 8 + H1 + 24], [bx, y2]]
+    : [[8 + CW, by], [320, by], [320, 153], [352, 153]];
+  const d = `M ${pts[0][0]} ${pts[0][1]} C ${pts[1][0]} ${pts[1][1]} ${pts[2][0]} ${pts[2][1]} ${pts[3][0]} ${pts[3][1]}`;
+
+  const p = interpolate(f, [80, 100], [0, 1], { ...C, easing: Easing.inOut(Easing.cubic) });
+  const u = 1 - p;
+  const bz = (k: number) => u * u * u * pts[0][k] + 3 * u * u * p * pts[1][k] + 3 * u * p * p * pts[2][k] + p * p * p * pts[3][k];
+  const dotOp = interpolate(f, [80, 84, 98, 102], [0, 1, 1, 0], C);
+
+  const card: React.CSSProperties = { position: "absolute", width: CW, boxSizing: "border-box", borderRadius: compact ? 22 : 26, border: "2px solid var(--border-strong)", background: "var(--surface)", padding: pad, display: "flex", flexDirection: "column", overflow: "hidden" };
+  const eyebrow: React.CSSProperties = { fontSize: 14, lineHeight: "18px", color: "var(--secondary)", whiteSpace: "nowrap" };
+  const title: React.CSSProperties = { fontFamily: display, fontWeight: 700, fontSize: compact ? 22 : 24, lineHeight: compact ? "26px" : "28px", letterSpacing: "-0.03em", marginTop: 2, whiteSpace: "nowrap" };
+
+  return (
+    <AbsoluteFill style={{ fontFamily: font, color: "var(--foreground)" }}>
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute", inset: 0 }}>
+        <g opacity={out} fill="none" stroke="var(--brand)" strokeWidth={3} strokeLinecap="round">
+          <path d={d} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - p} />
+          <circle cx={bz(0)} cy={bz(1)} r={6} fill="var(--brand)" stroke="none" opacity={dotOp} />
+        </g>
+      </svg>
+
+      <div style={{ ...card, left: 8, top: 8, height: H1, opacity: a * out, transform: `scale(${0.95 + 0.05 * a})` }}>
+        <div style={eyebrow}>Customer portal</div>
+        <div style={title}>Book a service</div>
+        <div style={{ marginTop: compact ? 12 : 14, display: "grid", gap: compact ? 8 : 10 }}>
+          {bookingFields.map(([label, value, start]) => {
+            const n = Math.max(0, Math.min(value.length, Math.floor((f - start) / 1.5)));
+            const typing = f >= start && n < value.length;
+            return (
+              <div key={label} style={{ display: compact ? "flex" : "block", alignItems: "center", gap: 10 }}>
+                <div style={{ fontSize: 14, lineHeight: "17px", color: "var(--secondary)", marginBottom: compact ? 0 : 4, width: compact ? 62 : undefined, flexShrink: 0 }}>{label}</div>
+                <div style={{ height: compact ? 40 : 38, flex: 1, minWidth: 0, boxSizing: "border-box", borderRadius: 12, border: `1.5px solid ${typing ? "var(--brand)" : "var(--border-strong)"}`, padding: "0 12px", display: "flex", alignItems: "center", fontSize: 17, whiteSpace: "nowrap", overflow: "hidden" }}>{value.slice(0, n)}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ marginTop: "auto", height: compact ? 44 : 46, flexShrink: 0, borderRadius: 999, background: "var(--brand)", color: "var(--on-brand)", display: "grid", placeItems: "center", fontSize: 18, fontWeight: 600, transform: `scale(${press ? 0.96 : 1})` }}>{f >= 84 ? "Booked" : "Book now"}</div>
+      </div>
+
+      <div style={{ ...card, left: x2, top: y2, height: H2, opacity: b * out, transform: `scale(${0.95 + 0.05 * b})` }}>
+        <div style={eyebrow}>Team schedule</div>
+        <div style={title}>Tue, Oct 14</div>
+        <div style={{ position: "relative", marginTop: compact ? 12 : 14, height: slotH * hours.length, flexShrink: 0 }}>
+          {hours.map((h, i) => (
+            <div key={h} style={{ position: "absolute", left: 0, right: 0, top: i * slotH, height: slotH, boxSizing: "border-box", borderTop: "1px solid var(--border)", fontSize: 13, lineHeight: "16px", color: "var(--secondary)", paddingTop: 5, whiteSpace: "nowrap" }}>{h}</div>
+          ))}
+          <div style={{ position: "absolute", left: compact ? 48 : 52, right: 0, top: slotH + 3, height: slotH - 6, boxSizing: "border-box", borderRadius: 10, background: "var(--brand)", color: "var(--on-brand)", padding: "0 12px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, fontSize: compact ? 15 : 16, whiteSpace: "nowrap", overflow: "hidden", opacity: block, transform: `scale(${0.92 + 0.08 * block})`, transformOrigin: "left center" }}>
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>Reyes Aircon</span><span style={{ opacity: 0.8, flexShrink: 0 }}>Ben</span>
+          </div>
+        </div>
+        <div style={{ marginTop: "auto", display: "grid", gap: 6, flexShrink: 0 }}>
+          {bookingChips.map(([t, s]) => (
+            <div key={t} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, lineHeight: "20px", height: 20, whiteSpace: "nowrap", opacity: interpolate(f, [s, s + 10], [0, 1], C) }}>
+              <CircleCheck size={18} strokeWidth={1.9} style={{ color: "var(--brand)", flexShrink: 0 }} />{t}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Cursor
+        clicks={[78]}
+        scale={compact ? 1.1 : 1.3}
+        vis={interpolate(f, [96, 108], [1, 0], C) * out}
+        stops={[[4, bx + (compact ? 80 : 90), by + (compact ? 40 : 36)], [62, bx, by], [80, bx, by], [108, bx + 40, by + 30]]}
+      />
+    </AbsoluteFill>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Dashboard: live numbers that update as the team works               */
+/* ------------------------------------------------------------------ */
+
+export const DASH_FRAMES = 240;
+
+export type DashProps = { compact?: boolean };
+
+const dashDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const dashData = [60, 80, 50, 95, 110, 70, 40];
+
+/** Canvas: wide 640 x 350, compact 360 x 292. */
+export function DashboardScene({ compact = false }: DashProps) {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const out = interpolate(f, [222, 238], [1, 0], C);
+  const ease = (s: number, d = 30) => Easing.out(Easing.cubic)(interpolate(f, [s, s + d], [0, 1], C));
+  const newJob = f >= 156;
+  const pulse = interpolate(f, [156, 160, 172], [0, 1, 0], C);
+  const extra = 14 * interpolate(f, [156, 172], [0, 1], C);
+
+  const W = compact ? 360 : 640;
+  const P = 8;
+  const gap = compact ? 8 : 12;
+  const tw = (W - 2 * P - 2 * gap) / 3;
+  const th = compact ? 76 : 98;
+  const top = P + th + gap;
+  const cp = compact ? 12 : 14;
+  const titleH = compact ? 18 : 22;
+  const AR = compact ? 120 : 140;
+  const labH = compact ? 16 : 20;
+  const chartH = cp + titleH + 8 + AR + 6 + labH + cp;
+  const base = top + cp + titleH + 8 + AR;
+  const side = compact ? 16 : 20;
+  const bw = compact ? 32 : 52;
+  const step = (W - 2 * P - 2 * side - bw) / 6;
+  const x0 = P + side;
+  const hMax = AR - 20;
+
+  const kpis: [string, string, LucideIcon][] = [
+    ["Open jobs", String(Math.round(24 * ease(6)) + (newJob ? 1 : 0)), Wrench],
+    ["Low stock", String(Math.round(3 * ease(14))), Boxes],
+    ["Revenue", `₱${Math.round(184 * ease(22))}k`, Wallet]
+  ];
+
+  return (
+    <AbsoluteFill style={{ fontFamily: font, color: "var(--foreground)", opacity: out }}>
+      {kpis.map(([label, value, Icon], i) => {
+        const s = spring({ frame: f - i * 6, fps, config: { damping: 200 } });
+        const hot = i === 0 ? pulse : 0;
+        return (
+          <div key={label} style={{ position: "absolute", left: P + i * (tw + gap), top: P, width: tw, height: th, boxSizing: "border-box", borderRadius: compact ? 18 : 22, border: `2px solid ${hot > 0.05 ? "var(--brand)" : "var(--border-strong)"}`, background: "var(--surface)", padding: compact ? "10px 12px" : "14px 16px", overflow: "hidden", opacity: s, transform: `scale(${(0.95 + 0.05 * s) * (1 + 0.03 * hot)})` }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4, fontSize: compact ? 12 : 15, lineHeight: compact ? "16px" : "18px", color: "var(--secondary)" }}>
+              <span style={{ minWidth: 0, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>{label}</span>
+              <Icon size={compact ? 16 : 20} strokeWidth={1.7} style={{ flexShrink: 0 }} />
+            </div>
+            <div style={{ fontFamily: display, fontWeight: 700, fontSize: compact ? 24 : 38, lineHeight: compact ? "28px" : "42px", letterSpacing: "-0.03em", marginTop: compact ? 4 : 6, whiteSpace: "nowrap" }}>{value}</div>
+          </div>
+        );
+      })}
+
+      <div style={{ position: "absolute", left: P, top, width: W - 2 * P, height: chartH, boxSizing: "border-box", borderRadius: compact ? 20 : 24, border: "2px solid var(--border-strong)", background: "var(--surface)", opacity: interpolate(f, [18, 30], [0, 1], C) }} />
+      <div style={{ position: "absolute", left: P + side, top: top + cp, height: titleH, lineHeight: `${titleH}px`, fontSize: compact ? 14 : 17, color: "var(--secondary)", whiteSpace: "nowrap", opacity: interpolate(f, [18, 30], [0, 1], C) }}>Jobs completed this week</div>
+      <div style={{ position: "absolute", right: P + side, top: top + cp, height: titleH, display: "flex", alignItems: "center", gap: 6, fontSize: compact ? 12 : 15, color: "var(--secondary)", opacity: interpolate(f, [18, 30], [0, 1], C) }}>
+        <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand)", opacity: 0.55 + 0.45 * Math.sin(f / 6) }} />Live
+      </div>
+      <div style={{ position: "absolute", left: x0, top: base, width: W - 2 * P - 2 * side, height: 2, background: "var(--border)" }} />
+      {dashData.map((v, i) => {
+        const hot = i === 3;
+        const h = ((v + (hot ? extra : 0)) / 110) * hMax * ease(30 + i * 6, 24);
+        return (
+          <div key={dashDays[i]}>
+            <div style={{ position: "absolute", left: x0 + i * step, top: base - h, width: bw, height: h, borderRadius: "8px 8px 3px 3px", background: "var(--brand)", opacity: hot ? 1 : 0.35 }} />
+            <div style={{ position: "absolute", left: x0 + i * step - 6, top: base + 6, width: bw + 12, height: labH, lineHeight: `${labH}px`, textAlign: "center", fontSize: compact ? 12 : 15, color: "var(--secondary)", whiteSpace: "nowrap", opacity: interpolate(f, [30 + i * 6, 42 + i * 6], [0, 1], C) }}>{dashDays[i]}</div>
+          </div>
+        );
+      })}
+      <div style={{ position: "absolute", left: x0 + 3 * step - 12, top: base - ((95 + extra) / 110) * hMax - 22, width: bw + 24, height: 18, lineHeight: "18px", textAlign: "center", fontSize: compact ? 13 : 16, color: "var(--brand)", fontWeight: 700, whiteSpace: "nowrap", opacity: interpolate(f, [158, 166, 196, 210], [0, 1, 1, 0], C) }}>+1 job</div>
+    </AbsoluteFill>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Direct: the same request through an agency and through the founder  */
+/* ------------------------------------------------------------------ */
+
+export const DIRECT_FRAMES = 240;
+
+export type DirectProps = { compact?: boolean };
+
+const agency: readonly [LucideIcon, string][] = [[User, "You"], [Briefcase, "Account manager"], [ClipboardList, "Project manager"], [Code, "Developer"]];
+const direct: readonly [LucideIcon, string][] = [[User, "You"], [UserCheck, "Founder"], [CircleCheck, "Built right"]];
+const A_T = [14, 42, 70, 98];
+const B_T = [122, 152, 182];
+const agencyText = ["Show the problem", "Which problem?", "Ticket #482: bug", "Built: Wrong fix"];
+const directText = ["Show the problem", "Fix the problem", "Done"];
+const RED = "rgba(239,68,68,0.9)";
+
+/** Canvas: wide 640 x 378, compact 360 x 340. */
+export function DirectScene({ compact = false }: DirectProps) {
+  const f = useCurrentFrame();
+  const out = interpolate(f, [222, 238], [1, 0], C);
+  const ease = { ...C, easing: Easing.inOut(Easing.cubic) };
+
+  const m = compact
+    ? { W: 360, nw: 76, nh: 70, tw: 170, th: 30, lab: 20, tfs: 13, lfs: 14, nfs: 12, nlh: 14, icon: 20, sec: 12, rfs: 13, ric: 16 }
+    : { W: 640, nw: 128, nh: 80, tw: 200, th: 34, lab: 22, tfs: 15, lfs: 17, nfs: 15, nlh: 18, icon: 22, sec: 14, rfs: 17, ric: 18 };
+  const P = 8;
+  const gx = (m.W - 2 * P - 4 * m.nw) / 3;
+  const nx = (i: number) => P + i * (m.nw + gx);
+  const ncx = (i: number) => nx(i) + m.nw / 2;
+  const nodesOff = m.lab + 4;
+  const tokenOff = nodesOff + m.nh + 6;
+  const resOff = tokenOff + m.th + 6;
+  const secH = resOff + m.lab;
+  const aTop = P;
+  const bTop = P + secH + m.sec;
+  const H = bTop + secH + P;
+
+  const ax = interpolate(f, A_T, [0, 1, 2, 3].map(ncx), ease);
+  const bx = interpolate(f, B_T, [0, 1, 2].map(ncx), ease);
+  const aIdx = Math.max(0, A_T.filter((t) => f >= t).length - 1);
+  const bIdx = Math.max(0, B_T.filter((t) => f >= t).length - 1);
+  const tokenLeft = (cx: number) => Math.min(m.W - P - m.tw, Math.max(P, cx - m.tw / 2));
+
+  const row = (items: readonly [LucideIcon, string][], top: number, times: number[], last: boolean) => (
+    <>
+      {items.map(([Icon, label], i) => {
+        const lit = f >= times[i];
+        const end = last && i === items.length - 1 && lit;
+        return (
+          <div key={label} style={{ position: "absolute", left: nx(i), top: top + nodesOff, width: m.nw, height: m.nh, boxSizing: "border-box", borderRadius: compact ? 18 : 22, border: `2px solid ${lit ? "var(--brand)" : "var(--border-strong)"}`, background: end ? "var(--brand)" : "var(--surface)", color: end ? "var(--on-brand)" : "var(--foreground)", padding: compact ? "0 4px" : "0 12px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: compact ? "center" : "flex-start", textAlign: compact ? "center" : "left", gap: compact ? 4 : 6, overflow: "hidden", opacity: out }}>
+            <Icon size={m.icon} strokeWidth={1.7} style={{ flexShrink: 0 }} />
+            <div style={{ fontFamily: display, fontWeight: 700, fontSize: m.nfs, lineHeight: `${m.nlh}px`, letterSpacing: "-0.02em" }}>{label}</div>
+          </div>
+        );
+      })}
+    </>
+  );
+
+  const token: React.CSSProperties = { position: "absolute", width: m.tw, height: m.th, boxSizing: "border-box", borderRadius: 999, background: "var(--surface)", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 10px", fontSize: m.tfs, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" };
+  const label: React.CSSProperties = { position: "absolute", left: P, height: m.lab, lineHeight: `${m.lab}px`, fontSize: m.lfs, color: "var(--secondary)", whiteSpace: "nowrap" };
+  const result: React.CSSProperties = { position: "absolute", left: P, width: m.W - 2 * P, height: m.lab, display: "flex", alignItems: "center", gap: 8, fontSize: m.rfs, color: "var(--secondary)", whiteSpace: "nowrap", overflow: "hidden" };
+  const clip: React.CSSProperties = { minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" };
+
+  return (
+    <AbsoluteFill style={{ fontFamily: font, color: "var(--foreground)" }}>
+      <svg width={m.W} height={H} viewBox={`0 0 ${m.W} ${H}`} style={{ position: "absolute", inset: 0 }}>
+        <g opacity={out} fill="none" strokeWidth={3} strokeLinecap="round">
+          {[0, 1, 2].map((i) => <line key={`a${i}`} x1={nx(i) + m.nw} y1={aTop + nodesOff + m.nh / 2} x2={nx(i + 1)} y2={aTop + nodesOff + m.nh / 2} stroke={f >= A_T[i + 1] ? "var(--brand)" : "var(--border-strong)"} />)}
+          {[0, 1].map((i) => <line key={`b${i}`} x1={nx(i) + m.nw} y1={bTop + nodesOff + m.nh / 2} x2={nx(i + 1)} y2={bTop + nodesOff + m.nh / 2} stroke={f >= B_T[i + 1] ? "var(--brand)" : "var(--border-strong)"} />)}
+        </g>
+      </svg>
+
+      <div style={{ ...label, top: aTop, opacity: out }}>A typical agency</div>
+      <div style={{ ...label, top: bTop, opacity: out * interpolate(f, [110, 122], [0, 1], C) }}>AcquisiFlow</div>
+      {row(agency, aTop, A_T, false)}
+      {row(direct, bTop, B_T, true)}
+
+      <div style={{ ...token, left: tokenLeft(ax), top: aTop + tokenOff, border: `2px solid ${aIdx === 3 ? RED : "var(--brand)"}`, color: aIdx === 3 ? RED : "var(--foreground)", opacity: interpolate(f, [6, 14], [0, 1], C) * out }}>{agencyText[aIdx]}</div>
+      <div style={{ ...token, left: tokenLeft(bx), top: bTop + tokenOff, border: "2px solid var(--brand)", color: "var(--foreground)", opacity: interpolate(f, [114, 122], [0, 1], C) * out }}>{directText[bIdx]}</div>
+
+      <div style={{ ...result, top: aTop + resOff, opacity: interpolate(f, [108, 120], [0, 1], C) * out }}>
+        <CircleX size={m.ric} strokeWidth={1.9} style={{ color: "#ef4444", flexShrink: 0 }} /><span style={clip}>Four hand-offs, and the request gets lost.</span>
+      </div>
+      <div style={{ ...result, top: bTop + resOff, opacity: interpolate(f, [190, 202], [0, 1], C) * out }}>
+        <CircleCheck size={m.ric} strokeWidth={1.9} style={{ color: "var(--brand)", flexShrink: 0 }} /><span style={clip}>{compact ? "Two hops. Built exactly as asked." : "Two hops. The founder scopes it and it gets built as asked."}</span>
       </div>
     </AbsoluteFill>
   );
