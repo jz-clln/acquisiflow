@@ -387,14 +387,16 @@ export function About() {
         <Head title="The founder who scopes your system stays on it">
           AcquisiFlow is small by choice. The founder leads discovery, planning, and quality review, so your decisions reach the people building the system with no account manager in between.
         </Head>
-        <figure className="mx-auto mt-10 max-w-2xl rounded-2xl border border-line bg-card p-2 sm:p-3">
-          <div className="hidden sm:block">
-            <Scene component={DirectScene} width={640} height={378} frames={DIRECT_FRAMES} still={210} label="Animation: the same request passes through four hand-offs at an agency and two with the founder" />
+        <figure className="mx-auto mt-10 max-w-2xl">
+          <div className="rounded-2xl border border-line bg-card p-2 sm:p-3">
+            <div className="hidden sm:block">
+              <Scene component={DirectScene} width={640} height={378} frames={DIRECT_FRAMES} still={210} label="Animation: the same request passes through four hand-offs at an agency and two with the founder" />
+            </div>
+            <div className="mx-auto max-w-sm sm:hidden">
+              <Scene component={DirectScene} inputProps={{ compact: true }} width={360} height={340} frames={DIRECT_FRAMES} still={210} label="Animation: the same request passes through four hand-offs at an agency and two with the founder" />
+            </div>
           </div>
-          <div className="mx-auto max-w-sm sm:hidden">
-            <Scene component={DirectScene} inputProps={{ compact: true }} width={360} height={340} frames={DIRECT_FRAMES} still={210} label="Animation: the same request passes through four hand-offs at an agency and two with the founder" />
-          </div>
-          <figcaption className="mt-2 text-center text-sm text-quiet">Show the same request being passed along in two different ways.</figcaption>
+          <figcaption className="mt-3 text-center text-sm text-quiet">Show the same request being passed along in two different ways.</figcaption>
         </figure>
         <dl className="mt-10 grid grid-cols-1 gap-x-10 sm:grid-cols-2">
           {principles.map(([Icon, t, d]) => (
