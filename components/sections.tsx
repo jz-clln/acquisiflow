@@ -152,7 +152,7 @@ export function Problem() {
           <div className="rounded-2xl border border-line bg-card p-3 sm:p-4">
             <Scene component={ToolsScene} width={720} height={440} frames={TOOLS_FRAMES} still={150} label="Illustration: five disconnected tools merge into one system" />
           </div>
-          <p className="mt-3 text-center text-sm text-quiet">Illustration. Five disconnected tools, then one system.</p>
+          <p className="mt-3 text-center text-sm text-quiet">Illustration showing five disconnected tools becoming one system.</p>
         </div>
         <ul className="mt-10 grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-4">
           {signs.map(([Icon, t, d]) => (
@@ -394,7 +394,7 @@ export function About() {
           <div className="mx-auto max-w-sm sm:hidden">
             <Scene component={DirectScene} inputProps={{ compact: true }} width={360} height={340} frames={DIRECT_FRAMES} still={210} label="Animation: the same request passes through four hand-offs at an agency and two with the founder" />
           </div>
-          <figcaption className="mt-2 text-center text-sm text-quiet">Illustration. The same request, passed along two different ways.</figcaption>
+          <figcaption className="mt-2 text-center text-sm text-quiet">Show the same request being passed along in two different ways.</figcaption>
         </figure>
         <dl className="mt-10 grid grid-cols-1 gap-x-10 sm:grid-cols-2">
           {principles.map(([Icon, t, d]) => (
