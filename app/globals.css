@@ -6,13 +6,13 @@
   color-scheme: light;
   --background: #f7f7f9; --foreground: #0f1115; --surface: #ffffff; --surface-soft: #eff0f4;
   --secondary: #4b5563; --muted: #6b7280; --border: #e3e5ea; --border-strong: #cdd1d8;
-  --brand: #3d5afe; --brand-dark: #2943d6; --brand-soft: #e9edff; --on-brand: #ffffff;
+  --brand: #3d5afe; --brand-dark: #2943d6; --brand-soft: #e9edff; --on-brand: #ffffff; --grid: rgba(15,17,21,.06);
 }
 [data-theme="dark"] {
   color-scheme: dark;
   --background: #0e0e0e; --foreground: #f2f2f2; --surface: #161616; --surface-soft: #1d1d1d;
   --secondary: #b8b8b8; --muted: #8f8f8f; --border: rgba(255,255,255,.12); --border-strong: rgba(255,255,255,.22);
-  --brand: #f2f2f2; --brand-dark: #ffffff; --brand-soft: rgba(255,255,255,.09); --on-brand: #0e0e0e;
+  --brand: #f2f2f2; --brand-dark: #ffffff; --brand-soft: rgba(255,255,255,.09); --on-brand: #0e0e0e; --grid: rgba(255,255,255,.06);
 }
 @layer base {
   *, ::before, ::after { border-color: var(--border); }
@@ -43,6 +43,10 @@
   details > summary::-webkit-details-marker { display: none; }
   details[open] .plus { transform: rotate(45deg); }
   .progress { display: none; }
+
+  /* Soft grid: thin low-contrast lines, static (no animation). Used on the hero and the contact section only. */
+  .grid-bg { background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 48px 48px; background-position: center top; -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent); mask-image: linear-gradient(to bottom, #000 45%, transparent); }
+  .grid-bg-both { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent); }
 
   /* Tool strip: one transformed track, two identical groups, so -50% loops seamlessly. */
   .marquee { position: relative; overflow: hidden; }

@@ -26,6 +26,8 @@ export const jobsPos = (f: number) => interpolate(f, [0, 40, 110, 190, 240], [1,
 export function JobsScene({ pos }: JobsProps) {
   const f = useCurrentFrame();
   const x = pos ?? jobsPos(f);
+  const assigned = f >= 131;
+  const rowsNow = system.map((r) => (assigned && r[0] === "1843" ? [r[0], r[1], "Ben", "Scheduled"] : r));
   const cell = (i: number): React.CSSProperties => ({ width: cols[i], padding: "0 22px", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" });
   return (
     <AbsoluteFill style={{ background: "var(--surface)", fontFamily: font, fontSize: 26, color: "var(--foreground)" }}>
@@ -39,9 +41,9 @@ export function JobsScene({ pos }: JobsProps) {
       </div>
       <div style={{ position: "absolute", inset: 0, background: "var(--surface)", clipPath: `inset(0 0 0 ${x * 100}%)` }}>
         <div style={{ height: TOP, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 26px", background: "var(--surface-soft)", borderBottom: "1px solid var(--border)" }}>
-          <b>Jobs system</b><span style={{ color: "var(--brand)", fontSize: 22 }}>2 need a technician</span>
+          <b>Jobs system</b><span style={{ color: "var(--brand)", fontSize: 22 }}>{assigned ? "1 needs a technician" : "2 need a technician"}</span>
         </div>
-        {system.map((r, i) => (
+        {rowsNow.map((r, i) => (
           <div key={i} style={{ display: "flex", height: ROW, alignItems: "center", borderBottom: "1px solid var(--border)" }}>
             {r.map((c, j) => (
               <div key={j} style={{ ...cell(j), overflow: j === 3 ? "visible" : "hidden", color: j === 2 && c === "Unassigned" ? "var(--foreground)" : j === 2 ? "var(--secondary)" : undefined, fontWeight: j === 2 && c === "Unassigned" ? 700 : 400 }}>
@@ -54,6 +56,13 @@ export function JobsScene({ pos }: JobsProps) {
       <div style={{ position: "absolute", top: 0, bottom: 0, left: `${x * 100}%`, width: 4, marginLeft: -2, background: "var(--brand)" }}>
         <div style={{ position: "absolute", top: "50%", left: "50%", width: 60, height: 60, marginTop: -30, marginLeft: -30, borderRadius: 999, background: "var(--brand)", color: "var(--on-brand)", display: "grid", placeItems: "center", fontSize: 22, boxShadow: "0 8px 24px rgba(0,0,0,.25)" }}>‹ ›</div>
       </div>
+      {pos === undefined && (
+        <Cursor
+          clicks={[36, 130]}
+          holds={[[36, 110]]}
+          stops={[[6, 900, 430], [34, 944, 244], [40, 944, 240], [110, 272, 240], [116, 272, 240], [128, 560, 204], [140, 560, 204], [176, 700, 330], [186, 900, 440]]}
+        />
+      )}
     </AbsoluteFill>
   );
 }
@@ -85,6 +94,30 @@ export function ConceptScene({ rows }: { rows: { label: string; value: number }[
 
 const C = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const display = "var(--font-display), var(--font-instrument), system-ui, sans-serif";
+
+type Stop = [frame: number, x: number, y: number];
+
+/** A simulated mouse pointer. It glides through `stops`, presses and ripples on `clicks`, and stays pressed during `holds`. */
+function Cursor({ stops, clicks, holds = [], scale = 1.3, vis = 1 }: { stops: Stop[]; clicks: number[]; holds?: [number, number][]; scale?: number; vis?: number }) {
+  const f = useCurrentFrame();
+  const frames = stops.map((p) => p[0]);
+  const ease = { ...C, easing: Easing.inOut(Easing.cubic) };
+  const x = interpolate(f, frames, stops.map((p) => p[1]), ease);
+  const y = interpolate(f, frames, stops.map((p) => p[2]), ease);
+  const show = interpolate(f, [frames[0], frames[0] + 10], [0, 1], C) * vis;
+  const down = clicks.some((c) => f >= c && f < c + 5) || holds.some(([a, b]) => f >= a && f <= b);
+  const ring = clicks.map((c) => f - c).find((d) => d >= 0 && d < 18);
+  return (
+    <>
+      {ring !== undefined && (
+        <div style={{ position: "absolute", left: x, top: y, width: 44, height: 44, marginLeft: -22, marginTop: -22, borderRadius: 999, border: "3px solid var(--brand)", opacity: (1 - ring / 18) * 0.7 * show, transform: `scale(${0.35 + (ring / 18) * 0.9})`, pointerEvents: "none" }} />
+      )}
+      <svg width={26} height={26} viewBox="0 0 26 26" style={{ position: "absolute", left: x, top: y, opacity: show, overflow: "visible", pointerEvents: "none", transformOrigin: "3px 2px", transform: `translate(-3px, -2px) scale(${(down ? 0.86 : 1) * scale})` }}>
+        <path d="M3 2 L3 21 L8 16.5 L11.2 24 L14.6 22.6 L11.4 15.3 L18 15.3 Z" fill="#fff" stroke="#0f1115" strokeWidth={1.7} strokeLinejoin="round" />
+      </svg>
+    </>
+  );
+}
 
 export const PROCESS_FRAMES = 240;
 
@@ -183,6 +216,7 @@ export function ProcessScene({ vertical = false }: ProcessProps) {
           </div>
         );
       })}
+
     </AbsoluteFill>
   );
 }

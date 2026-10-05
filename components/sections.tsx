@@ -46,7 +46,8 @@ const heroFacts: [LucideIcon, string][] = [
 
 export function Hero() {
   return (
-    <section id="top" className="relative pb-14 pt-12 sm:pt-14 lg:pb-16 lg:pt-16">
+    <section id="top" className="relative isolate pb-14 pt-12 sm:pt-14 lg:pb-16 lg:pt-16">
+      <div aria-hidden="true" className="grid-bg pointer-events-none absolute inset-0 -z-10" />
       <div className={wrap}>
         <div className="grid grid-cols-1 items-end gap-6 lg:grid-cols-[1.2fr_.8fr] lg:gap-12">
           <h1 className="display rise text-balance text-[clamp(2.1rem,4.6vw,3.9rem)] leading-[1.02]">We build custom software around your business.</h1>
@@ -64,7 +65,7 @@ export function Hero() {
         <div className="rise rise-3 mx-auto mt-10 max-w-4xl">
           <div className="overflow-hidden rounded-2xl border border-line bg-card p-1.5 shadow-[0_40px_80px_-56px_rgba(0,0,0,.45)] sm:p-2.5">
             <div className="overflow-hidden rounded-xl">
-              <Scene component={JobsScene} posAt={jobsPos} width={960} height={480} frames={JOBS_FRAMES} still={130} label="Animation: a spreadsheet of jobs turns into a jobs system" />
+              <Scene component={JobsScene} posAt={jobsPos} width={960} height={480} frames={JOBS_FRAMES} still={140} label="Animation: a spreadsheet of jobs turns into a jobs system" />
             </div>
           </div>
           <p className="mt-3 text-center text-sm text-quiet">Example data. Drag the divider to compare the spreadsheet with the jobs system.</p>
@@ -406,7 +407,8 @@ export function Faq() {
 
 export function Contact() {
   return (
-    <section id="contact" className="py-14 lg:py-20">
+    <section id="contact" className="relative isolate py-14 lg:py-20">
+      <div aria-hidden="true" className="grid-bg grid-bg-both pointer-events-none absolute inset-0 -z-10" />
       <div className={wrap}>
         <div className="relative overflow-hidden rounded-3xl border border-line bg-card p-[clamp(1.25rem,4vw,3rem)] shadow-[0_36px_80px_-60px_rgba(0,0,0,.4)]">
           <div className="relative grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1fr] lg:gap-14">
