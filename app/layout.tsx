@@ -13,12 +13,35 @@ export const metadata: Metadata = {
   title: { default: title, template: "%s | AcquisiFlow" },
   description: site.description,
   icons: { icon: "/acquisiflow-symbol.png" },
-  openGraph: { title, description: site.description, url: site.url, siteName: site.name, type: "website" },
-  twitter: { card: "summary_large_image", title, description: site.description }
+  openGraph: {
+    title,
+    description: site.description,
+    url: site.url,
+    siteName: site.name,
+    type: "website",
+    images: [
+      {
+        url: "/feat.png",
+        width: 1200,
+        height: 630,
+        alt: "AcquisiFlow: custom software built around your business"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description: site.description,
+    images: ["/feat.png"]
+  }
 };
+
 export const viewport: Viewport = {
   colorScheme: "light dark",
-  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#f7f7f9" }, { media: "(prefers-color-scheme: dark)", color: "#0e0e0e" }]
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7f7f9" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e0e0e" }
+  ]
 };
 
 // Runs before first paint: theme, a performance tier (data-perf "low" | "high") and a motion mode (data-motion "reduce" | "full").
