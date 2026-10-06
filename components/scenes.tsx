@@ -17,8 +17,8 @@ export type HeroProps = { compact?: boolean };
 type MsgIcon = ComponentType<{ size?: number; color?: string }>;
 
 const heroJobs: { icon: MsgIcon; app: string; text: string; name: string; sub: string; tech: string; time: string }[] = [
-  { icon: SiMessenger, app: "Messenger", text: "Pa-check po ng aircon bukas, Reyes Bldg.", name: "Reyes Aircon", sub: "Aircon check", tech: "Ben", time: "10:00" },
-  { icon: SiViber, app: "Viber", text: "Urgent: tumutulo ang tubo sa Lim Hardware!", name: "Lim Hardware", sub: "Pipe repair", tech: "Ana", time: "11:30" },
+  { icon: SiMessenger, app: "Messenger", text: "Can someone check AC tomorrow, Reyes Bldg..", name: "Reyes Aircon", sub: "Aircon check", tech: "Ben", time: "10:00" },
+  { icon: SiViber, app: "Viber", text: "Urgent: Pipes leaking at Lim Hardware!", name: "Lim Hardware", sub: "Pipe repair", tech: "Ana", time: "11:30" },
   { icon: SiGmail, app: "Email", text: "Quote for 3 units, Dela Cruz Bldg please.", name: "Dela Cruz", sub: "Quote, 3 units", tech: "Ben", time: "1:30" }
 ];
 const hm = (j: number) => 16 + j * 64;

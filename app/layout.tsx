@@ -22,10 +22,8 @@ export const metadata: Metadata = {
     other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
   },
   icons: {
-    icon: [
-      { url: "/acquisiflow-symbol-light.png", media: "(prefers-color-scheme: light)" },
-      { url: "/acquisiflow-symbol-dark.png", media: "(prefers-color-scheme: dark)" },
-    ],
+    // Keep a stable favicon URL in server HTML for browsers and search crawlers.
+    icon: [{ url: "/icon.png", type: "image/png", sizes: "1254x1254" }],
     apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }],
   },
 };
