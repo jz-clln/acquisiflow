@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
-      <body className={`${sans.variable} ${display.variable}`}><a href="#main-content" className="skip-link">Skip to content</a>{children}<ScrollFx /></body>
+      <body suppressHydrationWarning className={`${sans.variable} ${display.variable}`}><a href="#main-content" className="skip-link">Skip to content</a>{children}<ScrollFx /></body>
     </html>
   );
 }
