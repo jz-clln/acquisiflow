@@ -56,10 +56,10 @@ export function Hero() {
           <h1 className="display rise text-balance text-[clamp(2.1rem,4.6vw,3.9rem)] leading-[1.02]">We build custom software around your business.</h1>
           <div className="rise rise-2">
             <p className="max-w-md text-base leading-7 text-body">
-              AcquisiFlow is a software studio in the Philippines. We study how your team works, then build one system to replace your spreadsheets and disconnected tools.
+              AcquisiFlow designs and builds custom business software for growing companies that have outgrown spreadsheets, disconnected apps, and manual processes.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href="#contact" className="btn">Start a project<ArrowRight size={16} aria-hidden="true" className="btn-arrow" /></a>
+              <a href="#contact" className="btn">Start Your Project<ArrowRight size={16} aria-hidden="true" className="btn-arrow" /></a>
               <a href="#lab" className="btn btn-line">See the concept systems</a>
             </div>
           </div>
@@ -240,7 +240,7 @@ export function Services() {
     <section id="services" className="pb-14 lg:pb-20">
       <div className={wrap}>
         <Head title="We build the system your workflow needs">
-          Custom business software is our main work. We add automation, AI, and web platforms when the system calls for them.
+          Custom software development is our main work: business systems, web applications, and workflow automation. We add AI when it makes the work your team does easier.
         </Head>
         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {services.map(([Icon, t, d]) => (
@@ -350,7 +350,7 @@ export function Lab() {
     <section id="lab" className="bg-secondary py-14 lg:py-20">
       <div className={wrap}>
         <Head title="Concept systems from the AcquisiFlow Lab">
-          These are concepts with example data. They are not client work. They show how we approach common operations problems.
+          These are concepts with example data, not client work. They show how our <a href="#services" className="underline underline-offset-4">custom software services</a> address common operations problems.
         </Head>
         <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {concepts.map(([name, type, text, rows, Icon]) => (
@@ -385,7 +385,7 @@ export function About() {
     <section id="about" className="py-14 lg:py-20">
       <div className={wrap}>
         <Head title="The founder who scopes your system stays on it">
-          AcquisiFlow is small by choice. The founder leads discovery, planning, and quality review, so your decisions reach the people building the system with no account manager in between.
+          AcquisiFlow is small by choice. The founder leads discovery, planning, and quality review, so your decisions reach the people building the system with no account manager in between. <a href="#contact" className="underline underline-offset-4">Start Your Project</a>.
         </Head>
         <figure className="mx-auto mt-10 max-w-2xl">
           <div className="rounded-2xl border border-line bg-card p-2 sm:p-3">
@@ -415,8 +415,8 @@ export function About() {
 const faqs = [
   ["How does a project start?", "With a conversation about your workflow. We learn the process, the bottlenecks, and the outcome you need before we propose anything."],
   ["Do we need custom software?", "An existing product may fit your process. If it does, we will tell you to buy it. Custom software pays off when your tools do not fit, you juggle too many of them, or manual work costs you real money."],
-  ["What does it cost?", "We price each project by scope and value, not by the hour. Smaller projects split payment: 50% at the start and 50% before handover. Send us the tools you have outgrown, and we will describe the system and its cost."],
-  ["How long does it take?", "Scope sets the timeline. A first version takes two to four weeks when the scope allows. For larger systems, we give you a date after discovery."],
+  ["How much does custom software development cost?", "We price each project by scope and value, not by the hour. Smaller projects split payment: 50% at the start and 50% before handover. Send us the tools you have outgrown, and we will describe the system and its cost."],
+  ["How long does a custom software project take?", "Scope sets the timeline. A first version takes two to four weeks when the scope allows. For larger systems, we give you a date after discovery."],
   ["Can you connect the tools we already use?", "Yes. We integrate with the software you run today, so your existing tools feed one system."],
   ["Can we run it ourselves?", "Yes. We build software your team can maintain, train your team at launch, and offer optional monthly support."],
   ["Who will we work with?", "A small studio in the Philippines. The founder leads discovery, planning, and review. We serve clients here and in other countries."]

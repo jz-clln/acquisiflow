@@ -12,6 +12,7 @@ export async function POST(req: Request) {
 
   let body: Record<string, unknown>;
   try { body = await req.json(); } catch { return fail("Invalid request.", 400); }
+  if (!body || typeof body !== "object" || Array.isArray(body)) return fail("Invalid request.", 400);
   if (body.company) return NextResponse.json({ ok: true });
 
   const name = String(body.name ?? "").trim();
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
   }
 
   const key = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_EMAIL ?? "hello@acquisiflow.com";
+  const to = process.env.CONTACT_EMAIL ?? "support@acquisiflow.com";
   if (!key) return fail(`Email delivery is not set up yet. Write to ${to} instead.`, 503);
 
   const res = await fetch("https://api.resend.com/emails", {

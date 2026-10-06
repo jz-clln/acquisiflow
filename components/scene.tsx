@@ -35,26 +35,27 @@ export function Scene<P extends Record<string, unknown>>({ component, inputProps
     const el = box.current, player = ref.current;
     if (!el || !player) return;
 
-    let io: IntersectionObserver | undefined;
+    let visible = false;
 
     // Settle on the finished frame and stop playback (reduced motion, low-end devices, or a runtime downgrade).
     const rest = () => {
-      io?.disconnect();
       if (posAt) take(posAt(still));
-      else { manual.current = true; player.pause(); player.seekTo(still); }
+      else { player.pause(); player.seekTo(still); }
     };
 
-    if (isReducedMotion() || isLowPerf()) {
-      rest();
-      return;
-    }
-
-    io = new IntersectionObserver(([e]) => {
-      if (manual.current) return;
-      if (e.isIntersecting) player.play();
+    const playback = () => {
+      if (isReducedMotion() || isLowPerf()) { rest(); return; }
+      if (visible && !document.hidden && !manual.current) player.play();
       else player.pause();
+    };
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      playback();
     }, { threshold: 0.35 });
     io.observe(el);
+    playback();
+    document.addEventListener("visibilitychange", playback);
+    window.addEventListener("motion:change", playback);
 
     // Keep the invisible drag handle on top of the animated divider until the visitor grabs it.
     const onFrame = (e: { detail: { frame: number } }) => {
@@ -66,10 +67,11 @@ export function Scene<P extends Record<string, unknown>>({ component, inputProps
 
     return () => {
       io?.disconnect();
+      document.removeEventListener("visibilitychange", playback);
+      window.removeEventListener("motion:change", playback);
       player.removeEventListener("frameupdate", onFrame);
       window.removeEventListener("perf:low", rest);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [still, posAt]);
 
   function drag(e: PointerEvent<HTMLDivElement>) {

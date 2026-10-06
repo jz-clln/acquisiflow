@@ -1,7 +1,7 @@
 export const site = {
   name: "AcquisiFlow",
-  description: "AcquisiFlow is a small custom software studio in the Philippines. We build business systems around the way your team works.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://acquisiflow.com",
+  description: "AcquisiFlow designs and builds custom software for growing businesses. Replace spreadsheets, disconnected tools, and manual processes with software built around the way your company works.",
+  url: "https://acquisiflow.com",
   email: process.env.CONTACT_EMAIL ?? "support@acquisiflow.com",
   nav: [
     { label: "Services", href: "#services" },
