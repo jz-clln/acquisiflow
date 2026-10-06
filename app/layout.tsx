@@ -21,11 +21,7 @@ export const metadata: Metadata = {
     google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
     other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
   },
-  icons: {
-    // Keep a stable favicon URL in server HTML for browsers and search crawlers.
-    icon: [{ url: "/icon.png", type: "image/png", sizes: "1254x1254" }],
-    apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }],
-  },
+  // Icons are auto-detected from the files in /app: icon.png, favicon.ico, apple-icon.*
 };
 
 export const viewport: Viewport = {
