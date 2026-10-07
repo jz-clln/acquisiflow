@@ -6,15 +6,16 @@ import { useEffect, useRef, useState } from "react";
 import { site } from "@/lib/site";
 import { wrap } from "@/lib/ui";
 
-// Restore the browser tab's theme-aware symbol after hydration. The initial
-// server HTML still declares /icon.png; search engines control their selection.
+// Preserve the stable server-declared brand icon for crawlers while retaining
+// the browser tab's existing theme-aware symbol. Only manage our own link.
 function syncFavicon(theme: string | undefined) {
   const href = theme === "dark" ? "/acquisiflow-symbol-dark.png" : "/acquisiflow-symbol-light.png";
-  document.querySelectorAll('link[rel="icon"]').forEach((el) => el.remove());
+  document.querySelectorAll('link[data-af-tab-icon]').forEach((el) => el.remove());
   const link = document.createElement("link");
   link.rel = "icon";
   link.type = "image/png";
   link.href = href;
+  link.dataset.afTabIcon = "true";
   document.head.appendChild(link);
 }
 

@@ -74,9 +74,9 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/favicon.ico",
-        type: "image/x-icon",
-        sizes: "32x32",
+        url: "/acquisiflow-symbol-light.png",
+        type: "image/png",
+        sizes: "1254x1254",
       },
     ],
     shortcut: "/favicon.ico",
