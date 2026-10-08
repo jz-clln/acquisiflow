@@ -1,5 +1,23 @@
 import { test, expect } from "@playwright/test";
 
+test("privacy has its own indexable canonical and the favicon remains crawlable", async ({ request, page }) => {
+  const response = await request.get("/privacy?utm_source=test");
+  expect(response.status()).toBe(200);
+  const head = (await response.text()).split("</head>")[0];
+  expect(head).toContain('<link rel="canonical" href="https://acquisiflow.com/privacy"');
+  expect(head).toContain('<title>Privacy Policy | AcquisiFlow</title>');
+  expect(head).toContain('name="robots" content="index, follow"');
+  expect(head).not.toContain('content="noindex');
+  const icon = await request.get("/acquisiflow-symbol-light.png");
+  expect(icon.status()).toBe(200);
+  expect(icon.headers()["content-type"]).toContain("image/png");
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "Privacy Policy", exact: true })).toHaveAttribute("href", "/privacy");
+  await expect(page.locator('link[rel="icon"][href="/acquisiflow-symbol-light.png"]:not([data-af-tab-icon])')).toHaveCount(1);
+  await page.getByRole("link", { name: "Privacy Policy", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Privacy Policy");
+});
+
 test("production metadata, crawl files, schema and error status", async ({ request }) => {
   const response = await request.get("/?utm_source=test");
   expect(response.status()).toBe(200);
@@ -14,7 +32,8 @@ test("production metadata, crawl files, schema and error status", async ({ reque
   expect(schema["@graph"].map((node: { "@type": string }) => node["@type"])).toEqual(["Organization", "WebSite"]);
   expect(await (await request.get("/robots.txt")).text()).toContain("Sitemap: https://acquisiflow.com/sitemap.xml");
   const sitemap = await (await request.get("/sitemap.xml")).text();
-  expect(sitemap.match(/<loc>/g)).toHaveLength(1);
+  expect(sitemap.match(/<loc>/g)).toHaveLength(2);
+  expect(sitemap).toContain("<loc>https://acquisiflow.com/privacy</loc>");
   expect(sitemap).toContain("<loc>https://acquisiflow.com</loc>");
   expect((await request.get("/apple-icon")).headers()["content-type"]).toContain("image/png");
   const missing = await request.get("/missing-page");

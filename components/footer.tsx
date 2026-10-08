@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowUp, Mail } from "lucide-react";
 import { site } from "@/lib/site";
 import { wrap } from "@/lib/ui";
@@ -14,6 +15,7 @@ export function Footer() {
         <div className="text-[15px] text-body sm:text-right">
           <a href={`mailto:${site.email}`} className="inline-flex items-center gap-2 break-all text-ink underline underline-offset-4"><Mail size={16} aria-hidden="true" />{site.email}</a>
           <p className="mt-2 max-w-sm text-sm text-quiet">© {new Date().getFullYear()} AcquisiFlow. Philippines-based custom software studio serving businesses locally and internationally.</p>
+          <Link href="/privacy" className="mt-3 mr-4 inline-block text-sm text-ink underline underline-offset-4">Privacy Policy</Link>
           <a href="#top" className="mt-3 inline-flex items-center gap-1.5 text-sm text-ink underline underline-offset-4">Back to top<ArrowUp size={14} aria-hidden="true" /></a>
         </div>
       </div>

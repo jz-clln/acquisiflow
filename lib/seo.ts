@@ -7,7 +7,10 @@ export const isIndexable = process.env.NODE_ENV === "production"
   && process.env.SITE_NOINDEX !== "true";
 
 // Register real public pages here when launched. Update dates only for substantive changes.
-export const publicPages = [{ path: "/", lastModified: "2026-10-06", changeFrequency: "monthly" as const, priority: 1 }];
+export const publicPages = [
+  { path: "/", lastModified: "2026-10-06", changeFrequency: "monthly" as const, priority: 1 },
+  { path: "/privacy", lastModified: "2026-10-08", changeFrequency: "yearly" as const, priority: 0.3 },
+];
 
 export function pageMetadata(title: string, description: string, path: string): Metadata {
   const url = new URL(path, site.url).href;
